@@ -4,3 +4,5 @@ CVS/Root
 SLES11/CVS/Entries
 SLES11/CVS/Repository
 SLES11/CVS/Root
+.vscode/settings.json
+.cspell/custom-dictionary-workspace.txt
