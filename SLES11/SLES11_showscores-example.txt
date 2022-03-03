@@ -1,0 +1,131 @@
+== Example Results from a SLES11 cluster
+
+######################################################
+Apache Test Cluster
+######################################################
+
+lab1:~/bin # ./showscores.sh
+Resource                  Score     Node             Stickiness #Fail    Migration-Threshold
+apache                    -INFINITY lab2             120        0
+apache                    120       lab1             120        0
+rsc_ClusterMon:0          -INFINITY lab2             120        0
+rsc_ClusterMon:0          120       lab1             120        0
+rsc_ClusterMon:1          0         lab1             120        0
+rsc_ClusterMon:1          120       lab2             120        0
+rsc_ping                  0         lab2             120        0
+rsc_ping                  120       lab1             120        0
+rsc_stonith_sbd           0         lab1             120        0
+rsc_stonith_sbd           120       lab2             120        0
+virtual-ip                0         lab2             120        0
+virtual-ip                240       lab1             120        0
+
+lab1:~/bin # uname -a
+Linux lab1 3.0.101-108.68-default #1 SMP Mon Aug 13 18:53:23 UTC 2018 (ef94234) x86_64 x86_64 x86_64 GNU/Linux
+
+lab1:~ # ptest -Ls
+Allocation scores:
+native_color: rsc_ping allocation score on lab1: 120
+native_color: rsc_ping allocation score on lab2: 0
+native_color: rsc_stonith_sbd allocation score on lab1: 0
+native_color: rsc_stonith_sbd allocation score on lab2: 120
+group_color: web-server allocation score on lab1: 0
+group_color: web-server allocation score on lab2: 0
+group_color: virtual-ip allocation score on lab1: 120
+group_color: virtual-ip allocation score on lab2: 0
+group_color: apache allocation score on lab1: 120
+group_color: apache allocation score on lab2: 0
+native_color: virtual-ip allocation score on lab1: 240
+native_color: virtual-ip allocation score on lab2: 0
+native_color: apache allocation score on lab1: 120
+native_color: apache allocation score on lab2: -INFINITY
+clone_color: ClusterMon-clone allocation score on lab1: 0
+clone_color: ClusterMon-clone allocation score on lab2: 0
+clone_color: rsc_ClusterMon:0 allocation score on lab1: 120
+clone_color: rsc_ClusterMon:0 allocation score on lab2: 0
+clone_color: rsc_ClusterMon:1 allocation score on lab1: 0
+clone_color: rsc_ClusterMon:1 allocation score on lab2: 120
+native_color: rsc_ClusterMon:1 allocation score on lab1: 0
+native_color: rsc_ClusterMon:1 allocation score on lab2: 120
+native_color: rsc_ClusterMon:0 allocation score on lab1: 120
+native_color: rsc_ClusterMon:0 allocation score on lab2: -INFINITY
+
+lab1:~ # crm_simulate -Ls
+
+Current cluster status:
+Online: [ lab1 lab2 ]
+
+ rsc_ping	(ocf::pacemaker:ping):	Started lab1
+ rsc_stonith_sbd	(stonith:external/sbd):	Started lab2
+ Resource Group: web-server
+     virtual-ip	(ocf::heartbeat:IPaddr2):	Started lab1
+     apache	(ocf::heartbeat:apache):	Started lab1
+ Clone Set: ClusterMon-clone [rsc_ClusterMon]
+     Started: [ lab1 lab2 ]
+
+Allocation scores:
+native_color: rsc_ping allocation score on lab1: 120
+native_color: rsc_ping allocation score on lab2: 0
+native_color: rsc_stonith_sbd allocation score on lab1: 0
+native_color: rsc_stonith_sbd allocation score on lab2: 120
+group_color: web-server allocation score on lab1: 0
+group_color: web-server allocation score on lab2: 0
+group_color: virtual-ip allocation score on lab1: 120
+group_color: virtual-ip allocation score on lab2: 0
+group_color: apache allocation score on lab1: 120
+group_color: apache allocation score on lab2: 0
+native_color: virtual-ip allocation score on lab1: 240
+native_color: virtual-ip allocation score on lab2: 0
+native_color: apache allocation score on lab1: 120
+native_color: apache allocation score on lab2: -INFINITY
+clone_color: ClusterMon-clone allocation score on lab1: 0
+clone_color: ClusterMon-clone allocation score on lab2: 0
+clone_color: rsc_ClusterMon:0 allocation score on lab1: 120
+clone_color: rsc_ClusterMon:0 allocation score on lab2: 0
+clone_color: rsc_ClusterMon:1 allocation score on lab1: 0
+clone_color: rsc_ClusterMon:1 allocation score on lab2: 120
+native_color: rsc_ClusterMon:1 allocation score on lab1: 0
+native_color: rsc_ClusterMon:1 allocation score on lab2: 120
+native_color: rsc_ClusterMon:0 allocation score on lab1: 120
+native_color: rsc_ClusterMon:0 allocation score on lab2: -INFINITY
+
+
+== SAP Cluster Example 
+
+ENSA1 - 11.03.2020
+######################################################
+resource-stickiness: 1000
+Resource                             Score     Node                 Stickiness #Fail    Migration-Threshold
+admin-ip                             0         mgt033               1000       0        5
+admin-ip                             1000      mgt032               1000       0        5
+rsc_ip_AP1_asxxxxx112                0         mgt033               1000       0        5
+rsc_ip_AP1_asxxxxx112                4010      mgt032               1000       0        5
+rsc_ip_AP1_erxxxxx112                0         mgt032               1000       0        5
+rsc_ip_AP1_erxxxxx112                4000      mgt033               1000       0        5
+rsc_sap_AP1_ASCS62:0                 0         mgt032               1000       0        5
+rsc_sap_AP1_ASCS62:0                 1100      mgt033               1000       0        5
+rsc_sap_AP1_ASCS62:0_(master)        1102      mgt033               1000       0        5
+rsc_sap_AP1_ASCS62:1                 -INFINITY mgt033               1000       0        5
+rsc_sap_AP1_ASCS62:1                 1100      mgt032               1000       0        5
+rsc_sap_AP1_ASCS62:1_(master)        2104      mgt032               1000       0        5
+stonith-sbd                          0         mgt032               1000       0        5
+stonith-sbd                          1000      mgt033               1000       0        5
+
+
+Now with resource-stickiness: 1
+######################################################
+Resource                             Score     Node                 Stickiness #Fail    Migration-Threshold
+admin-ip                             0         mgt033               1          0        5
+admin-ip                             1         mgt032               1          0        5
+rsc_ip_AP1_asxxxxx112                0         mgt033               1000       0        5
+rsc_ip_AP1_asxxxxx112                4010      mgt032               1000       0        5
+rsc_ip_AP1_erxxxxx112                0         mgt032               1000       0        5
+rsc_ip_AP1_erxxxxx112                4000      mgt033               1000       0        5
+rsc_sap_AP1_ASCS62:0                 0         mgt032               1          0        5
+rsc_sap_AP1_ASCS62:0                 101       mgt033               1          0        5
+rsc_sap_AP1_ASCS62:0_(master)        1102      mgt033               1          0        5
+rsc_sap_AP1_ASCS62:1                 -INFINITY mgt033               1          0        5
+rsc_sap_AP1_ASCS62:1                 101       mgt032               1          0        5
+rsc_sap_AP1_ASCS62:1_(master)        2104      mgt032               1          0        5
+stonith-sbd                          0         mgt032               1          0        5
+stonith-sbd                          1         mgt033               1          0        5
+ 
