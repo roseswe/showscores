@@ -4,6 +4,11 @@ Changelog
 
 (unreleased)
 ------------
+- Add: GitChangeLog file. [roseswe]
+
+
+1.0.1 (2022-03-03)
+------------------
 
 Changes
 ~~~~~~~
