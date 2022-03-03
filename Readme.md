@@ -6,6 +6,8 @@ In the sub-directory **SLES11** you will find a slight enhanced and adapted vers
 
 In SLES12 and SLES15 commands and their output changed, so a new simplified showscores was _invented_!  :sparkles:
 
+See also the SUSE TID <https://www.suse.com/support/kb/doc/?id=000019442>  (no default-resource-stickiness)
+
 ## Requirements
 
 This showscores version will not run under SLES11 because there the standard AWK version is too old (GNU AWK 3.1.8) to support multidimensional arrays.

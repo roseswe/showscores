@@ -1,12 +1,11 @@
 #!/bin/bash
+###################################################################################
 # Display cluster scores of pacemaker resources
 # vim:set fileencoding=utf8 fileformat=unix filetype=shell tabstop=2 expandtab:
 # @(#)$Id: showscores,v 1.1 2022/03/03 19:34:44 ralph Exp $
 # (c) 2012-2022 by Ralph Roth, rose_swe@gmx.net
-
+###################################################################################
 ## WARNING: This is for SLES12/SLES15, will not work on SLES1x
-## SLES12/SLES15 -> https://www.suse.com/support/kb/doc/?id=000019442  (no default-resource-stickiness)
-
 ###################################################################################
 
 if [ "$1" = "--help" -o "$1" = "-h" ]
