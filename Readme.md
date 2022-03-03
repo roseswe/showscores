@@ -10,9 +10,9 @@ See also the SUSE TID <https://www.suse.com/support/kb/doc/?id=000019442>  (no d
 
 ## Requirements
 
-This showscores version will not run under SLES11 because there the standard AWK version is too old (GNU AWK 3.1.8) to support multidimensional arrays.
+This `showscores` version will not run under SLES11 because there the standard AWK version is too old (GNU AWK 3.1.8) to support multidimensional arrays (please use the version found in the SLES11 subdirectory).
 
-It will run under SLES1SP52 = GNU AWK 4.1.8 (API 1.0), SLES15SP3 = GNU AWK 4.2.1, API: 2.0
+It will run under SLES1SP52 = GNU AWK 4.1.8 (API: 1.0), SLES15SP3 = GNU AWK 4.2.1 (API: 2.0)
 
 ## Example Output SLES15
 
