@@ -1,0 +1,25 @@
+Changelog
+=========
+
+
+(unreleased)
+------------
+
+Changes
+~~~~~~~
+- Gitignore - new files added. [roseswe]
+- AWK versions. [Ralph Roth]
+
+
+1.0.0 (2022-03-03)
+------------------
+
+New
+~~~
+- Initial git commit. [roseswe]
+
+Changes
+~~~~~~~
+- SUSE TID moved. [roseswe]
+
+
