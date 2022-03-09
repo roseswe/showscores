@@ -2,7 +2,7 @@
 
 This program tries to show the scores each pacemaker resource has on cluster members (nodes).
 Original idea and script for older pacemaker versions (1.x) was done around 2009 by Dominik Klein.
-In the sub-directory **SLES11** you will find a slight enhanced and adapted version that runs only on SLES11 pacemaker clusters.
+In the sub-directory **SLES11** you will find a slightly enhanced and adapted version that runs **only on SLES11** pacemaker clusters.
 
 In SLES12 and SLES15 commands and their output changed, so a new simplified showscores was _invented_!  :sparkles:
 
@@ -10,9 +10,9 @@ See also the SUSE TID <https://www.suse.com/support/kb/doc/?id=000019442>  (no d
 
 ## Requirements
 
-This `showscores` version will not run under SLES11 because there the standard AWK version is too old (GNU AWK 3.1.8) to support multidimensional arrays (please use the version found in the SLES11 subdirectory).
+This `showscores` version will not run under SLES11 because there the standard (G)AWK version is too old (GNU AWK 3.1.8) to support multidimensional arrays (please use instead the `showscores` version found in the SLES11 subdirectory).
 
-It will run under SLES1SP52 = GNU AWK 4.1.8 (API: 1.0), SLES15SP3 = GNU AWK 4.2.1 (API: 2.0)
+It will run under SLES12SP5 = GNU AWK 4.1.8 (API: 1.0) and SLES15SP3 = GNU AWK 4.2.1 (API: 2.0)
 
 ## Example Output SLES15
 
