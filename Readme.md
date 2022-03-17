@@ -42,4 +42,4 @@ prm_vg1                                   -INFINITY          -INFINITY
 stonith-sbd                                     123                  0
 ```
 <!-- vim:set fileencoding=utf8 fileformat=unix filetype=gfm tabstop=2 expandtab:
-$Id: Readme.md,v 1.2 2022/03/04 07:32:44 ralph Exp $ -->
+$Id: Readme.md,v 1.3 2022/03/17 08:58:01 ralph Exp $ -->
