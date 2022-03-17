@@ -2,10 +2,10 @@
 ###################################################################################
 # Display cluster scores of pacemaker resources
 # vim:set fileencoding=utf8 fileformat=unix filetype=shell tabstop=2 expandtab:
-# @(#)$Id: showscores,v 1.1 2022/03/03 19:34:44 ralph Exp $
+# @(#)$Id: showscores,v 1.2 2022/03/04 07:32:44 ralph Exp $
 # (c) 2012-2022 by Ralph Roth, rose_swe@gmx.net
 ###################################################################################
-## WARNING: This is for SLES12/SLES15, will not work on SLES1x
+## WARNING: This is for SLES12/SLES15, will not work on SLES9/10/11
 ###################################################################################
 
 if [ "$1" = "--help" -o "$1" = "-h" ]
@@ -20,9 +20,12 @@ fi
 default_stickiness=$(crm_attribute -G -n resource-stickiness -t rsc_defaults -Q 2>/dev/null)
 default_migrationthreshold=$(crm_attribute -G -n migration-threshold -t rsc_defaults -Q 2>/dev/null)
 
+## TODO: Stop here if an error is raised -> cluster framework not running (e.g. crm cluster stop)
+
 echo "rsc_defaults: resource-stickiness=${default_stickiness}   migration-threshold=${default_migrationthreshold}"
 echo ""
 
+## TODO: Maybe replace in the tr command ":" with "_" for better readability?
 crm resource scores | awk ' / allocation score on / { print $2, $6, $NF; }' | tr -d ":" | sort -u | \
 awk '           ## requires a modern GNU AWK implementation!
 {
@@ -38,15 +41,17 @@ END {
 
     printf("##[ Resource ]#####[ Nodes -> ]##");
     for (i in hosts)  printf ("%18s ", i);
-    printf ("\n"); 
+    printf ("\n");
 
     for (i in a)
     {
         printf("%-32s ", i)
         for (j in a[i])
             printf("%18s ",  a[i][j]);
-        printf ("\n"); 
+        printf ("\n");
     }
 }
 ' | sort -u
 
+echo ""
+echo "Showscore taken on node: $(hostname) at $(date)"
