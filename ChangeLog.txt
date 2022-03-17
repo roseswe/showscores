@@ -4,6 +4,21 @@ Changelog
 
 (unreleased)
 ------------
+
+Changes
+~~~~~~~
+- Added TODOs (to create issues) add: uname+date. [roseswe]
+- Refreshed. [roseswe]
+
+Other
+~~~~~
+- Merged with local copy. [roseswe]
+- Merge branch 'master' of https://github.com/roseswe/showscores.
+  [roseswe]
+- Update Readme.md. [Ralph Roth]
+
+  small enhancements
+  spelling errors fixed
 - Add: GitChangeLog file. [roseswe]
 
 
