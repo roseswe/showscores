@@ -16,6 +16,8 @@ then
 
     exit 0
 fi
+# bug detected with non-standard locales
+export LC_ALL=C   
 
 default_stickiness=$(crm_attribute -G -n resource-stickiness -t rsc_defaults -Q 2>/dev/null)
 default_migrationthreshold=$(crm_attribute -G -n migration-threshold -t rsc_defaults -Q 2>/dev/null)
