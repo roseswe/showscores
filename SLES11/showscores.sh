@@ -2,6 +2,7 @@
 # Display scores of Pacemaker resources
 # vim:set fileencoding=utf8 fileformat=unix filetype=shell tabstop=2 expandtab:
 # @(#)$Id: showscores.sh,v 2.1 2022/03/03 19:28:40 ralph Exp $
+# shellcheck disable=SC2155,SC2086
 
 ## WARNING: This is for SLES11 only.... maybe working on other distros with pacemaker ?
 
@@ -30,7 +31,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-if [ "$1" = "--help" -o "$1" = "-h" ]
+if [ "$1" = "--help" ] || [ "$1" = "-h" ]
 then
     echo "Pacemaker showscores.sh (v1, SLES11) - basically parsing crm_simulate -Ls/ptest -Ls."
     echo "Usage: "
@@ -52,11 +53,13 @@ then
     sortby=3
 fi
 
-export default_stickiness=`crm_attribute -G -n default-resource-stickiness -t rsc_defaults -Q 2>/dev/null`
+default_stickiness=$(crm_attribute -G -n default-resource-stickiness -t rsc_defaults -Q 2>/dev/null)
+export default_stickiness
 if [ -z "$default_stickiness" ]; then default_stickiness=0; fi
-export default_migrationthreshold=`crm_attribute -G -n migration-threshold -t rsc_defaults -Q 2>/dev/null`
+default_migrationthreshold=$(crm_attribute -G -n migration-threshold -t rsc_defaults -Q 2>/dev/null)
+export default_migrationthreshold
 
-if [ -n "$1" -a "$1" != "node" ]
+if [ -n "$1" ] && [ "$1" != "node" ]
 then
     resource=$1
 fi
@@ -65,28 +68,28 @@ then
     nodename=$2
 fi
 
-2>&1 crm_simulate -Ls | grep -E "$resource" | grep -E "$nodename" > $tmpfile01
+2>&1 crm_simulate -Ls | grep -E "$resource" | grep -E "$nodename" > "$tmpfile01"
 
 parseline() {
-    if ! echo $*|grep -q "promotion score"; then
+    if ! echo "${*}"|grep -q "promotion score"; then
         shift;
     fi
     res=$1; shift; shift; shift; shift;
-    node=$(echo $1|sed 's/:$//'); shift;
+    node=$(echo "${1}"|sed 's/:$//'); shift;
     score=$1;
 }
 
 get_stickiness() {
     res="$1"
     # get meta attribute resource_stickiness
-    if ! stickiness=`crm_resource -g resource-stickiness -r $res --meta -Q 2>/dev/null`
+    if ! stickiness=$(crm_resource -g resource-stickiness -r ${res} --meta -Q 2>/dev/null)
     then
         # if no resource-specific stickiness is configured, use the default value
         stickiness="$default_stickiness"
     fi
 
     # get meta attribute resource_failure_stickiness
-    if ! migrationthreshold=`crm_resource -g migration-threshold -r $res --meta -Q 2>/dev/null`
+    if ! migrationthreshold=$(crm_resource -g migration-threshold -r ${res} --meta -Q 2>/dev/null)
     then
         # if that doesn't exist, use the default value
         migrationthreshold="$default_migrationthreshold"
@@ -94,7 +97,7 @@ get_stickiness() {
 }
 
 get_failcount() { #usage $0 res node
-    failcount=`crm_failcount -G -r $1 -U $2 -Q 2>/dev/null|grep -o "^[0-9]*$"`
+    failcount=$(crm_failcount -G -r $1 -U $2 -Q 2>/dev/null|grep -o "^[0-9]*$")
 }
 
 #determine the longest resource name to adjust width of the first column
