@@ -1,5 +1,26 @@
 #$ more .github/workflows/shellcheck.yml
 name: Shellcheck Lint
+<<<<<<< HEAD
+#description: Automated checking of shell scripts using shellcheck utility
+# The workflow is not valid. .github/workflows/shellcheck.yml (Line: 3, Col: 1): Unexpected value 'description' .github/workflows/shellcheck.yml (Line: 5, Col: 1): Unexpected value 'runs'
+
+# runs:
+#   using: 'node16'
+#   main: 'start.js'
+# branding:
+#   icon: 'arrow-up-circle'
+#   color: 'green'
+=======
+description: Automated checking of shell scripts using shellcheck utility
+
+runs:
+  using: 'node16'
+  main: 'start.js'
+branding:
+  icon: 'arrow-up-circle'
+  color: 'green'
+>>>>>>> beb9534 (fix: first try to fix issue number four)
+
 on:
   push:
     paths:
