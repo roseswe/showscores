@@ -2,13 +2,23 @@ Changelog
 =========
 
 
-(unreleased)
-------------
+1.0.1 (2022-11-18)
+------------------
 
 Changes
 ~~~~~~~
+- Updated to reflect version 1.0.1-6. [roseswe]
 - Added TODOs (to create issues) add: uname+date. [roseswe]
 - Refreshed. [roseswe]
+- Gitignore - new files added. [roseswe]
+- AWK versions. [Ralph Roth]
+
+Fix
+~~~
+- Issue number four. [roseswe]
+- Tried to fix all shellcheck errors, hopefully this doesn't break the
+  SLES11 script? [roseswe]
+- Bug detected with non-standard locales. [Ralph Roth]
 
 Other
 ~~~~~
@@ -20,15 +30,6 @@ Other
   small enhancements
   spelling errors fixed
 - Add: GitChangeLog file. [roseswe]
-
-
-1.0.1 (2022-03-03)
-------------------
-
-Changes
-~~~~~~~
-- Gitignore - new files added. [roseswe]
-- AWK versions. [Ralph Roth]
 
 
 1.0.0 (2022-03-03)
