@@ -1,7 +1,7 @@
 #!/bin/bash
 # Display scores of Pacemaker resources
 # vim:set fileencoding=utf8 fileformat=unix filetype=shell tabstop=2 expandtab:
-# @(#)$Id: showscores.sh,v 2.1 2022/03/03 19:28:40 ralph Exp $
+# @(#)$Id: showscores.sh,v 2.2 2022/11/17 21:20:13 ralph Exp $
 # shellcheck disable=SC2155,SC2086
 
 ## WARNING: This is for SLES11 only.... maybe working on other distros with pacemaker ?

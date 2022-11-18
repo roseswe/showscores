@@ -2,7 +2,7 @@
 ###################################################################################
 # Display cluster scores of pacemaker resources
 # vim:set fileencoding=utf8 fileformat=unix filetype=shell tabstop=2 expandtab:
-# @(#)$Id: showscores,v 1.4 2022/09/21 16:08:45 ralph Exp $
+# @(#)$Id: showscores,v 1.5 2022/11/17 21:19:47 ralph Exp $
 # (c) 2012-2022 by Ralph Roth, rose_swe@gmx.net
 ###################################################################################
 ## WARNING: This is for SLES12/SLES15, will not work on SLES9/10/11

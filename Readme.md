@@ -12,7 +12,7 @@ See also the SUSE TID <https://www.suse.com/support/kb/doc/?id=000019442>  (no d
 
 This `showscores` version will not run under SLES11 because there the standard (G)AWK version is too old (GNU AWK 3.1.8) to support multidimensional arrays (please use instead the `showscores` version found in the SLES11 subdirectory).
 
-It will run under SLES12SP5 = GNU AWK 4.1.8 (API: 1.0) and SLES15SP3 = GNU AWK 4.2.1 (API: 2.0)
+It will run under SLES12SP5 = GNU AWK 4.1.8 (API: 1.0), SLES15SP2 = GNU AWK 4.1.0 (API: 1.0) and SLES15SP3 = GNU AWK 4.2.1 (API: 2.0)
 
 ## Example Output SLES15
 
@@ -41,5 +41,8 @@ prm_mariadb                                       0                  0
 prm_vg1                                   -INFINITY          -INFINITY
 stonith-sbd                                     123                  0
 ```
-<!-- vim:set fileencoding=utf8 fileformat=unix filetype=gfm tabstop=2 expandtab:
-$Id: Readme.md,v 1.3 2022/03/17 08:58:01 ralph Exp $ -->
+
+<!--
+vim:set fileencoding=utf8 fileformat=unix filetype=gfm tabstop=2 expandtab:
+$Id: Readme.md,v 1.4 2022/11/17 21:19:46 ralph Exp $
+-->
