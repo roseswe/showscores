@@ -12,7 +12,7 @@ name: Shellcheck Lint
 
 on:
   push:
-    paths:
+    paths:  ### maybe wrong indention? FIXME! # Incorrect type. Expected "array".
       # Run workflow on every push
 
   # Allows you to run this workflow manually from the Actions tab
