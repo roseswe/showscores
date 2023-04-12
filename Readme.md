@@ -1,14 +1,17 @@
 # Pacemaker ShowScores for SLES12 and SLES15
 
 This program tries to show the scores each pacemaker resource has on cluster members (nodes).
-Original idea and script for older pacemaker versions (1.x) was done around 2009 by Dominik Klein.
-In the sub-directory **SLES11** you will find a slightly enhanced and adapted version that runs **only on SLES11** pacemaker clusters.
-
-In SLES12 and SLES15 commands and their output changed, so a new simplified showscores was _invented_!  :sparkles:
 
 See also the SUSE TID <https://www.suse.com/support/kb/doc/?id=000019442>  (no default-resource-stickiness)
 
-NOTE: This program should not be limited to two node clusters all other scripts I am aware of!
+NOTE: This program should not be limited to two node clusters like all other scripts I am aware of!
+
+## Motivation
+
+In SLES12 and SLES15 commands and their output changed, so a new simplified showscores was _invented_!  :sparkles:
+
+Original idea and script for older pacemaker versions (1.x) was done around 2009 by Dominik Klein.
+In the sub-directory **SLES11** you will find a slightly enhanced and adapted version of Dominik original idea that runs **only on SLES11** pacemaker clusters.
 
 ## Requirements
 
@@ -65,7 +68,7 @@ rsc_SAPHana_TST_HDB001                         1102          -INFINITY          
 rsc_ip_TST_HDB00_master                           0          -INFINITY               3000
 rsc_ip_TST_HDB00_readenabled                   3000          -INFINITY                  0
 
-Showscore taken on node: hanode_04 at Wed Apr 12 12:13:08 CEST 2023
+Showscore taken on node: hanode_mm at Wed Apr 12 12:13:08 CEST 2023
 ```
 
 NOTE: hanode_mm is the "Majority Maker" node
@@ -73,5 +76,5 @@ NOTE: hanode_mm is the "Majority Maker" node
 
 <!--
 vim:set fileencoding=utf8 fileformat=unix filetype=gfm tabstop=2 expandtab:
-$Id: Readme.md,v 1.5 2023/04/05 11:56:03 ralph Exp $
+$Id: Readme.md,v 1.6 2023/04/12 12:04:52 ralph Exp $
 -->
