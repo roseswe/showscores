@@ -20,6 +20,7 @@ fi
 export LC_ALL=C
 
 ## TODO: Needs a fix, see issue#6 and see https://github.com/SUSE/suse-best-practices/issues/370
+## TODO: See https://bugzilla.suse.com/show_bug.cgi?id=1210614 - Bug 1210614 - Duplicated entries for resource-stickiness and https://github.com/ClusterLabs/crmsh/pull/1174
 default_stickiness=$(crm_attribute -G -n resource-stickiness -t rsc_defaults -Q 2>/dev/null)
 default_migrationthreshold=$(crm_attribute -G -n migration-threshold -t rsc_defaults -Q 2>/dev/null)
 
