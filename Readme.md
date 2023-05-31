@@ -4,7 +4,7 @@ This program tries to show the scores each pacemaker resource has on cluster mem
 
 See also the SUSE TID <https://www.suse.com/support/kb/doc/?id=000019442>  (no default-resource-stickiness)
 
-NOTE: This program should not be limited to two node clusters like all other scripts I am aware of!
+NOTE: This program is *not* limited to two-node clusters (see examples below) like all the other scripts that I am aware of!
 
 ## Motivation
 
@@ -71,10 +71,51 @@ rsc_ip_TST_HDB00_readenabled                   3000          -INFINITY          
 Showscore taken on node: hanode_mm at Wed Apr 12 12:13:08 CEST 2023
 ```
 
-NOTE: hanode_mm is the "Majority Maker" node
+NOTE: hanode_mm is the "Majority Maker" node  and the rsc_defaults output is affected by "Bug 1210614 - Duplicated entries for resource-stickiness"
 
+## Example Output SLES15, 3 Node SAP HANA SRA cluster, read-enable setup - wrong stickiness/threshold
+
+``` shell
+
+rsc_defaults: resource-stickiness=1   migration-threshold=3
+
+
+##[ Resource ]#####[ Nodes ]##       majority-maker              node01             node02
+
+admin-ip                                          0                  1                  0
+cln_SAPHanaTopology_R44_HDB00             -INFINITY                  0                  0
+msl_SAPHana_R44_HDB00                     -INFINITY                  1                  1
+rsc_SAPHanaTopology_R44_HDB000            -INFINITY                  1                  0
+rsc_SAPHanaTopology_R44_HDB001            -INFINITY                  0                  1
+rsc_SAPHanaTopology_R44_HDB002            -INFINITY                  0                  0
+rsc_SAPHana_R44_HDB000                    -INFINITY                152                  1
+rsc_SAPHana_R44_HDB001                    -INFINITY                  0                102
+rsc_ip_R44_HDB00_master                   -INFINITY               2001                  0
+rsc_ip_R44_HDB00_readenabled              -INFINITY                  0               2001
+
+```
+## Example Output SLES15, 3 Node SAP HANA SRA cluster, read-enable setup - stickiness/threshold according to SUSE Best Practices
+
+``` shell
+rsc_defaults: resource-stickiness=1000   migration-threshold=5000
+
+##[ Resource ]#####[ Nodes -> ]##    majority-maker             node01             node02
+
+cln_SAPHanaTopology_R44_HDB00             -INFINITY                  0                  0
+msl_SAPHana_R44_HDB00                     -INFINITY                  2                  2
+rsc_SAPHanaTopology_R44_HDB000            -INFINITY               1000                  0
+rsc_SAPHanaTopology_R44_HDB001            -INFINITY                  0               1000
+rsc_SAPHanaTopology_R44_HDB002            -INFINITY                  0                  0
+rsc_SAPHana_R44_HDB000                    -INFINITY               1152                  2
+rsc_SAPHana_R44_HDB001                    -INFINITY                  0               1102
+rsc_admin-ip                                      0               1000                  0
+rsc_ip_R44_HDB00_master                   -INFINITY               3000                  0
+rsc_ip_R44_HDB00_readenabled              -INFINITY                  0               3000
+```
+
+end of documentation....
 
 <!--
 vim:set fileencoding=utf8 fileformat=unix filetype=gfm tabstop=2 expandtab:
-$Id: Readme.md,v 1.6 2023/04/12 12:04:52 ralph Exp $
+$Id: Readme.md,v 1.7 2023/05/30 08:20:10 ralph Exp $
 -->
