@@ -2,11 +2,13 @@ Changelog
 =========
 
 
-(unreleased)
-------------
+1.0.2 (2023-05-31)
+------------------
 
 Changes
 ~~~~~~~
+- Documented bsc#1210614 for issue resource-stickiness=Multiple
+  attributes match  --  #6. [roseswe]
 - Added results of 3node cluster. [roseswe]
 - Tested and documented with a 3 node cluster, closes issue #1.
   [roseswe]
@@ -15,6 +17,8 @@ Changes
 
 Other
 ~~~~~
+- Add: added more 3 node cluster examples. [roseswe]
+- Upd: 📝 ChangeLog. [roseswe]
 - 🩹 fix deprecation warning: [Thomas Merz]
 
   Node.js 12 actions are deprecated.
