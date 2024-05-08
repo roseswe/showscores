@@ -15,9 +15,9 @@ In the sub-directory **SLES11** you will find a slightly enhanced and adapted ve
 
 ## Requirements
 
-This `showscores` version will not run under SLES11 because there the standard (G)AWK version is too old (GNU AWK 3.1.8) to support multidimensional arrays (please use instead the `showscores` version found in the SLES11 sub-directory).
+This `showscores` version will **not** run under SLES11 because there the standard (G)AWK version is too old (GNU AWK 3.1.8) to support multidimensional arrays (please use instead the `showscores` version found in the SLES11 sub-directory). On the other hand SLES11 is meanwhile End-Of-Support/End-Of-Life (EoS/EoL).
 
-It will run under SLES12SP5 = GNU AWK 4.1.8 (API: 1.0), SLES15SP2 = GNU AWK 4.1.0 (API: 1.0) and SLES15SP3/SP4 = GNU AWK 4.2.1 (API: 2.0)
+It will run under SLES12SP5 = GNU AWK 4.1.8 (API: 1.0), SLES15SP2 = GNU AWK 4.1.0 (API: 1.0) and SLES15SP3/SP4/SP5 = GNU AWK 4.2.1 (API: 2.0)
 
 ## Example Output SLES15, 2 node cluster
 
@@ -117,5 +117,5 @@ end of documentation....
 
 <!--
 vim:set fileencoding=utf8 fileformat=unix filetype=gfm tabstop=2 expandtab:
-$Id: Readme.md,v 1.7 2023/05/30 08:20:10 ralph Exp $
+$Id: Readme.md,v 1.9 2024/05/08 11:03:53 ralph Exp $
 -->
