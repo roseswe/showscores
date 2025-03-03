@@ -2,6 +2,16 @@ Changelog
 =========
 
 
+(unreleased)
+------------
+
+Changes
+~~~~~~~
+- Updated Readme with SP5 fix: +x attributes added for the shell
+  scripts. [roseswe]
+- Updated the changelog for release 1.0.2. [roseswe]
+
+
 1.0.2 (2023-05-31)
 ------------------
 
