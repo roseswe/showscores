@@ -1,10 +1,10 @@
 # Pacemaker ShowScores for SLES12 and SLES15
 
-This program tries to show the scores each pacemaker resource has on cluster members (nodes).
+This program displays the scores of each pacemaker resource it has on cluster nodes, presenting the node names and resource names in a clear, tabular format
 
 See also the SUSE TID <https://www.suse.com/support/kb/doc/?id=000019442>  (no default-resource-stickiness)
 
-NOTE: This program is *not* limited to two-node clusters (see examples below) like all the other scripts that I am aware of!
+✍ NOTE: Unlike other scripts I’ve encountered, this program is **not** restricted to two-node clusters (see examples below). It has been successfully tested on clusters with up to 8 nodes.
 
 ## Motivation
 
@@ -71,7 +71,15 @@ rsc_ip_TST_HDB00_readenabled                   3000          -INFINITY          
 Showscore taken on node: hanode_mm at Wed Apr 12 12:13:08 CEST 2023
 ```
 
-NOTE: hanode_mm is the "Majority Maker" node  and the rsc_defaults output is affected by "Bug 1210614 - Duplicated entries for resource-stickiness"
+✍ NOTE: hanode_mm is the "Majority Maker" node  and the rsc_defaults output is affected by "Bug 1210614 - Duplicated entries for resource-stickiness"
+
+Example of the bug:
+
+    cib_pm_node001.txt-rsc_defaults build-resource-defaults: \
+    cib_pm_node001.txt:	resource-stickiness=1 🔥
+    cib_pm_node001.txt-rsc_defaults rsc-options: \
+    cib_pm_node001.txt-	migration-threshold=5000 \
+    cib_pm_node001.txt:	resource-stickiness=1000
 
 ## Example Output SLES15, 3 Node SAP HANA SRA cluster, read-enable setup - wrong stickiness/threshold
 
