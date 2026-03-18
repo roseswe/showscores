@@ -2,7 +2,7 @@
 ###################################################################################
 # Display cluster scores of pacemaker resources
 # vim:set fileencoding=utf8 fileformat=unix filetype=shell tabstop=2 expandtab:
-# @(#)$Id: showscores,v 1.8 2025/03/03 16:30:44 ralph Exp $
+# @(#)$Id: showscores,v 1.9 2025/04/30 15:25:15 ralph Exp $
 # (c) 2012-2025 by Ralph Roth, rose_swe@gmx.net
 ###################################################################################
 ## WARNING: This is for SLES12/SLES15, will not work on SLES9/10/11 whatever
@@ -31,7 +31,7 @@ echo ""
 
 ## TODO: Maybe replace in the tr command ":" with "_" for better readability?
 ## TODO: Sort host before outputting them
-crm resource scores | awk ' / allocation score on / { print $2, $6, $NF; }' | tr -d ":" | sort -u | \
+crm resource scores | sort | awk ' / allocation score on / { print $2, $6, $NF; }' | tr -d ":" | sort -u | \
 awk '           ## requires a modern GNU AWK implementation!
 {
     r=$1        ## resource
