@@ -1,4 +1,4 @@
-# Pacemaker ShowScores for SLES12 and SLES15
+# Pacemaker ShowScores for SLES and RHEL
 
 This program displays the scores of each pacemaker resource it has on cluster nodes, presenting the node names and resource names in a clear, tabular format
 
@@ -8,16 +8,24 @@ See also the SUSE TID <https://www.suse.com/support/kb/doc/?id=000019442>  (no d
 
 ## Motivation
 
+### Version 1 and 2
 In SLES12 and SLES15 commands and their output changed, so a new simplified showscores was _invented_!  :sparkles:
 
 Original idea and script for older pacemaker versions (1.x) was done around 2009 by Dominik Klein.
 In the sub-directory **SLES11** you will find a slightly enhanced and adapted version of Dominik original idea that runs **only on SLES11** pacemaker clusters.
+
+### Version 3
+
+Added support for RHEL/MLS and derivates. Might need some additional work e.g. for rsc_defaults: resource-stickiness
 
 ## Requirements
 
 This `showscores` version will **not** run under SLES11 because there the standard (G)AWK version is too old (GNU AWK 3.1.8) to support multidimensional arrays (please use instead the `showscores` version found in the SLES11 sub-directory). On the other hand SLES11 is meanwhile End-Of-Support/End-Of-Life (EoS/EoL).
 
 It will run under SLES12SP5 = GNU AWK 4.1.8 (API: 1.0), SLES15SP2 = GNU AWK 4.1.0 (API: 1.0) and SLES15SP3/SP4/SP5/SP6 = GNU AWK 4.2.1 (API: 2.0)
+
+Version 3.x was tested with MLS7.9 (RHEL 7.9), so showscores should also work on RHEL9 and RHEL10.
+> resource-stickiness and migration-threshold may require a rewrite
 
 ## Example Output SLES15, 2 node cluster
 
@@ -121,9 +129,28 @@ rsc_ip_R44_HDB00_master                   -INFINITY               3000          
 rsc_ip_R44_HDB00_readenabled              -INFINITY                  0               3000
 ```
 
+## Example Output from a SLES15 KVM Cluster
+
+✍  "Selfwritten/self designed cluster"
+```
+rsc_defaults: resource-stickiness=120   migration-threshold=5
+
+##[ Resource ]#####[ Nodes ]##        kvm02cstltss        kvm01csltss
+ClusterMon-clone                                  0                  0
+cl_NodeUtil                                       0                  0
+rsc_ClusterMonEL0                               120                  0
+rsc_ClusterMonEL1                                 0                120
+rsc_Dummy01                                     120                  0
+rsc_cl_NodeUtil0                                120                  0
+rsc_cl_NodeUtil1                                  0                120
+rsc_vd_cirros                                   120                  0
+rsc_vd_sles15                                     0                120
+sbd-fencing                                       0                120
+```
+
 end of documentation....
 
 <!--
 vim:set fileencoding=utf8 fileformat=unix filetype=gfm tabstop=2 expandtab:
-$Id: Readme.md,v 1.12 2025/04/11 12:37:41 ralph Exp $
+$Id: Readme.md,v 1.14 2026/03/19 14:18:52 ralph Exp $
 -->

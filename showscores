@@ -2,21 +2,44 @@
 ###################################################################################
 # Display cluster scores of pacemaker resources
 # vim:set fileencoding=utf8 fileformat=unix filetype=shell tabstop=2 expandtab:
-# @(#)$Id: showscores,v 1.9 2025/04/30 15:25:15 ralph Exp $
-# (c) 2012-2025 by Ralph Roth, rose_swe@gmx.net
+# @(#)$Id: showscores,v 1.13 2026/03/19 14:18:52 ralph Exp $
+# (c) 2012-2026 by Ralph Roth, rose_swe@gmx.net
 ###################################################################################
 ## WARNING: This is for SLES12/SLES15, will not work on SLES9/10/11 whatever
+## Tested with MLS7.9 (RHEL 7.9), so this should also work with RHEL9 & RHEL10
 ###################################################################################
 
-if [ "$1" = "--help" ] || [ "$1" = "-h" ]
+if [ "$1" = "--help" ] || [ "$1" = "-h" ] || [ "$1" = "-?" ]
 then
-    echo "Pacemaker showscores (v2) - parsing crm resource scores"
-    echo "Usage:"
-    echo "$0 (to display score information for all resources on all nodes sorted by resource name)"
+    echo "Pacemaker showscores (v3) - parsing crm/pcs resource scores"
+    echo ""
+    echo "---=[ Usage ]=---------------------------------------------"
+    echo "$0 to display score information for all resources on all nodes sorted by resource name"
+    echo ""
+    echo "$0 <file> to display score information for all resources on all nodes"
+    echo "sorted by resource name, where <file> is a file containing the output of"
+    echo ""
+    echo "'crm resource scores' or 'crm_simulate -sL'"
 
     exit 0
 fi
+
+source /etc/os-release		## get OS env
+case "${ID}" in
+	sles)	CMD="crm resource scores" ;;
+	rhel|centos|fedora)  CMD="crm_simulate -sL" ;;
+  zorin)  CMD="crm_simulate -sL" ;;
+	*)	echo "Unsupported Operation System: $ID"; exit 1 ;;
+esac
+
+## OK, a quick hack to allow parsing of a file instead of executing the command, e.g. for testing or if the cluster framework is not running
+if [ "$#" -gt 0 ] && [ -r "${1}" ]
+then
+    CMD="cat $1"
+fi
+
 # bug detected with non-standard locales
+#
 export LC_ALL=C
 
 ## TODO: Needs a fix, see issue#6 and see https://github.com/SUSE/suse-best-practices/issues/370
@@ -31,32 +54,70 @@ echo ""
 
 ## TODO: Maybe replace in the tr command ":" with "_" for better readability?
 ## TODO: Sort host before outputting them
-crm resource scores | sort | awk ' / allocation score on / { print $2, $6, $NF; }' | tr -d ":" | sort -u | \
-awk '           ## requires a modern GNU AWK implementation!
-{
-    r=$1        ## resource
-    h=$2        ## host/node
-    s=$3        ## score on that node
 
-    a[r][h]=s
-    hosts[h] ++
+# 1. Capture the scores and clean them
+# 2. Use AWK to build a matrix, preserving -INFINITY
+# 3. Sort the host headers for a consistent table layout
+# Execute and Parse
+$CMD | sort | awk ' / allocation score on / {
+    # $2=resource, $6=host, $NF=score
+    print $2, $6, $NF;
+}' | tr -d ":" | sort -u | \
+awk '
+{
+    r=$1; h=$2; s=$3;
+
+    # Logic to handle both INFINITY types:
+    # 1. If we already have -INFINITY, never overwrite (Hard Restriction)
+    if (a[r][h] == "-INFINITY") {
+        next
+    }
+
+    # 2. If the new score is -INFINITY, it always wins
+    if (s == "-INFINITY") {
+        a[r][h] = s
+        hosts[h]++
+        next
+    }
+
+    # 3. If we already have INFINITY, only -INFINITY can overwrite it
+    if (a[r][h] == "INFINITY") {
+        next
+    }
+
+    # 4. Otherwise, store the score
+    a[r][h] = s
+    hosts[h]++
 }
 
 END {
+    # Sort Host Headers
+    n_h = 0
+    for (h in hosts) sorted_hosts[++n_h] = h
+    asort(sorted_hosts)
 
-    printf("##[ Resource ]#####[ Nodes ]##  ");
-    for (i in hosts)  printf ("%18s ", i);
-    printf ("\n");
+    # Print Header
+    printf("##[ Resource ]#####[ Nodes ]##   ")
+    for (i=1; i<=n_h; i++) printf ("%18s ", sorted_hosts[i])
+    printf ("\n")
 
-    for (i in a)
-    {
-        printf("%-32s ", i)
-        for (j in a[i])
-            printf("%18s ",  a[i][j]);
-        printf ("\n");
+    # Sort and Print Resources
+    n_r = 0
+    for (r in a) res_list[++n_r] = r
+    asort(res_list)
+
+    for (i=1; i<=n_r; i++) {
+        r = res_list[i]
+        printf("%-32s ", r)
+        for (j=1; j<=n_h; j++) {
+            h = sorted_hosts[j]
+            val = (h in a[r]) ? a[r][h] : "0"
+            printf("%18s ", val)
+        }
+        printf ("\n")
     }
 }
-' | sort -u
+'
 
 echo ""
-echo "Showscore taken on node: $(hostname) at $(date)"
+echo "Showscore taken on node: $(hostname) ($PRETTY_NAME) at $(date)"
