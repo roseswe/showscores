@@ -152,5 +152,5 @@ end of documentation....
 
 <!--
 vim:set fileencoding=utf8 fileformat=unix filetype=gfm tabstop=2 expandtab:
-$Id: Readme.md,v 1.14 2026/03/19 14:18:52 ralph Exp $
+$Id: Readme.md,v 1.15 2026/03/20 12:53:57 ralph Exp $
 -->
