@@ -2,6 +2,21 @@ Changelog
 =========
 
 
+(unreleased)
+------------
+
+Changes
+~~~~~~~
+- Versionsumbers bumped. [roseswe]
+- Regression on groups fixed? add: Unique exit codes + documented.
+  [roseswe]
+
+Other
+~~~~~
+- Add: rhel7/mls7 support added. [roseswe]
+- Upd: Recorded the changes done for version 3 bump. [roseswe]
+
+
 3.0.1 (2026-03-20)
 ------------------
 
