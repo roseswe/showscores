@@ -27,6 +27,22 @@ It will run under SLES12SP5 = GNU AWK 4.1.8 (API: 1.0), SLES15SP2 = GNU AWK 4.1.
 Version 3.x was tested with MLS7.9 (RHEL 7.9), so showscores should also work on RHEL9 and RHEL10.
 > resource-stickiness and migration-threshold may require a rewrite
 
+
+## Exit Codes
+
+| Code | Summary                   | Description                                                              |
+| ---: | :------------------------ | :----------------------------------------------------------------------- |
+|  `0` | Success                   | Scores displayed successfully, or help (`-h`, `--help`, `-?`) was shown. |
+|  `1` | Unsupported OS            | OS `ID` in `/etc/os-release` is not in the supported SLES or RHEL list.  |
+|  `2` | Input file unreadable     | Specified `<file>` argument does not exist or lacks read permissions.    |
+|  `3` | Missing `/etc/os-release` | `/etc/os-release` is missing or unreadable when running in live mode.    |
+|  `4` | Missing binary            | Required command (`gawk` or `crm_simulate`) was not found in `PATH`.     |
+|  `5` | Cluster query failed      | `crm_simulate -sL` failed (cluster stopped or insufficient permissions). |
+|  `6` | No scores found           | Command or file output contained no `allocation score on` entries.       |
+|  `7` | Too many arguments        | More than one positional argument passed (`Usage: showscores [file]`).   |
+
+
+
 ## Example Output SLES15, 2 node cluster
 
 ``` shell
@@ -154,3 +170,4 @@ end of documentation....
 vim:set fileencoding=utf8 fileformat=unix filetype=gfm tabstop=2 expandtab:
 $Id: Readme.md,v 1.15 2026/03/20 12:53:57 ralph Exp $
 -->
+Exit Code ReferenceExit CodeMeaning0Success (scores displayed or --help shown)1Unsupported operating system (ID from /etc/os-release)2Input file specified, but missing or not readable3/etc/os-release missing or not readable in live mode4Required binary (gawk or crm_simulate) not found in PATH5Cluster query failed (cluster stopped or insufficient permissions)6No allocation score on entries found in the output/file7Too many command-line arguments

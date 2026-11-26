@@ -2,14 +2,30 @@
 ###################################################################################
 # Display cluster scores of pacemaker resources
 # vim:set fileencoding=utf8 fileformat=unix filetype=shell tabstop=2 expandtab:
-# @(#)$Id: showscores,v 1.15 2026/04/08 06:19:10 ralph Exp $
+# @(#)$Id: showscores,v 1.16 2026/04/17 07:43:49 ralph Exp $
 # (c) 2012-2026 by Ralph Roth, rose_swe@gmx.net
 ###################################################################################
 ## WARNING: This is for SLES12/SLES15, will not work on SLES9/10/11 whatever
 ## Tested with MLS7.9 (RHEL 7.9), so this should also work with RHEL9 & RHEL10
 ###################################################################################
+## Exit Codes:
+##   0 - Success (or help displayed)
+##   1 - Unsupported Operating System
+##   2 - Input file does not exist or is not readable
+##   3 - /etc/os-release missing or not readable (live mode)
+##   4 - Required tool (gawk or crm_simulate) not found in PATH
+##   5 - Cluster framework not running or insufficient permissions
+##   6 - No allocation scores found in command/file output
+##   7 - Invalid number of command-line arguments
+###################################################################################
 
-if [ "$1" = "--help" ] || [ "$1" = "-h" ] || [ "$1" = "-?" ]
+set -uo pipefail
+
+# bug detected with non-standard locales
+#
+export LC_ALL=C
+
+if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ] || [ "${1:-}" = "-?" ]
 then
     echo "Pacemaker showscores (v3) - parsing crm/pcs resource scores"
     echo ""
@@ -20,108 +36,206 @@ then
     echo "sorted by resource name, where <file> is a file containing the output of"
     echo ""
     echo "'crm resource scores' or 'crm_simulate -sL'"
+    echo ""
+    echo "---=[ Exit Codes ]=----------------------------------------"
+    echo "0=OK/Help, 1=Unsupported OS, 2=Unreadable file, 3=Missing /etc/os-release,"
+    echo "4=Missing binary, 5=Cluster query failed, 6=No scores found, 7=Too many args"
 
     exit 0
 fi
 
-source /etc/os-release		## get OS env
-case "${ID}" in
-	sles)	CMD="crm resource scores"
-        ## HINT: Needs a fix, see issue#6 and see https://github.com/SUSE/suse-best-practices/issues/370
-        ## HINT: See https://bugzilla.suse.com/show_bug.cgi?id=1210614 - Bug 1210614 - Duplicated entries for resource-stickiness and https://github.com/ClusterLabs/crmsh/pull/1174
-        default_stickiness=$(crm_attribute -G -n resource-stickiness -t rsc_defaults -Q 2>/dev/null)
-    ;;
-	rhel|centos|fedora)  CMD="crm_simulate -sL"
-        ## MLS7.9 (RHEL 7.9) does not support crm_attribute, so we have to parse the output of pcs property instead, which is a bit more error-prone, but should work for RHEL9/RHEL10 as well
-        default_stickiness=$(pcs property | grep default-resource-stickiness: | awk '{print $2}')
-    ;;
-
-	*)	echo "[!!] Unsupported Operation System: $ID"; exit 1 ;;
-esac
-
-## OK, a quick hack to allow parsing of a file instead of executing the command, e.g. for testing or if the cluster framework is not running
-if [ "$#" -gt 0 ] && [ -r "${1}" ]
+if [ "$#" -gt 1 ]
 then
-    CMD="cat $1"
+    echo "[!!] Too many arguments. Usage: $0 [file]" >&2
+    exit 7
 fi
 
-# bug detected with non-standard locales
-#
-export LC_ALL=C
+if ! command -v gawk >/dev/null 2>&1
+then
+    echo "[!!] Required binary 'gawk' not found in PATH." >&2
+    exit 4
+fi
 
-default_migrationthreshold=$(crm_attribute -G -n migration-threshold -t rsc_defaults -Q 2>/dev/null)
+## OK, a quick hack to allow parsing of a file instead of executing the command, e.g. for testing or if the cluster framework is not running
+FROM_FILE=0
+if [ "$#" -eq 1 ]
+then
+    if [ ! -r "${1}" ]
+    then
+        echo "[!!] Cannot read input file: ${1}" >&2
+        exit 2
+    fi
+    FROM_FILE=1
+    INPUT_FILE="${1}"
+fi
 
-## TODO: Stop here if an error is raised -> cluster framework not running (e.g. crm cluster stop)
+if [ "${FROM_FILE}" -eq 0 ]
+then
+    if [ ! -r /etc/os-release ]
+    then
+        echo "[!!] Cannot read /etc/os-release to detect Operating System." >&2
+        exit 3
+    fi
+    # shellcheck disable=SC1091
+    source /etc/os-release		## get OS env
 
-echo "rsc_defaults: resource-stickiness=${default_stickiness}   migration-threshold=${default_migrationthreshold}"
-echo ""
+    if ! command -v crm_simulate >/dev/null 2>&1
+    then
+        echo "[!!] Required binary 'crm_simulate' not found in PATH." >&2
+        exit 4
+    fi
 
-## TODO: Maybe replace in the tr command ":" with "_" for better readability?
-## TODO: Sort host before outputting them
+    case "${ID:-unknown}" in
+        sles|sles_sap|opensuse*)
+            ## Use crm_simulate -sL directly instead of 'crm resource scores' (missing or pre-formatted in newer crmsh)
+            CMD=(crm_simulate -sL)
+            ## HINT: Needs a fix, see issue#6 and see https://github.com/SUSE/suse-best-practices/issues/370
+            ## HINT: See https://bugzilla.suse.com/show_bug.cgi?id=1210614 - Bug 1210614 - Duplicated entries for resource-stickiness and https://github.com/ClusterLabs/crmsh/pull/1174
+            default_stickiness=$(crm_attribute -G -n resource-stickiness -t rsc_defaults -Q 2>/dev/null | head -n1 || true)
+        ;;
+        rhel|centos|fedora|rocky|almalinux|ol)
+            CMD=(crm_simulate -sL)
+            ## MLS7.9 (RHEL 7.9) does not support crm_attribute, so we have to parse the output of pcs property instead, which is a bit more error-prone, but should work for RHEL9/RHEL10 as well
+            ## NOTE: RHEL8/9/10 moved stickiness to rsc_defaults; try crm_attribute, then 'pcs resource defaults', then legacy 'pcs property'
+            default_stickiness=$(crm_attribute -G -n resource-stickiness -t rsc_defaults -Q 2>/dev/null | head -n1 || true)
+            if [ -z "${default_stickiness}" ] && command -v pcs >/dev/null 2>&1
+            then
+                default_stickiness=$(pcs resource defaults 2>/dev/null | gawk -F'[=:] *' '/resource-stickiness/ {print $2; exit}' || true)
+            fi
+            if [ -z "${default_stickiness}" ] && command -v pcs >/dev/null 2>&1
+            then
+                default_stickiness=$(pcs property 2>/dev/null | gawk '/default-resource-stickiness:/ {print $2; exit}' || true)
+            fi
+        ;;
+        *)
+            echo "[!!] Unsupported Operating System: ${ID:-unknown}" >&2
+            exit 1
+        ;;
+    esac
 
-# 1. Capture the scores and clean them
-# 2. Use AWK to build a matrix, preserving -INFINITY
+    default_migrationthreshold=$(crm_attribute -G -n migration-threshold -t rsc_defaults -Q 2>/dev/null | head -n1 || true)
+
+    ## Stop here if an error is raised -> cluster framework not running (e.g. crm cluster stop)
+    if ! RAW_OUTPUT=$("${CMD[@]}" 2>&1)
+    then
+        echo "[!!] Failed to query cluster scores (cluster framework not running or insufficient permissions):" >&2
+        echo "${RAW_OUTPUT}" >&2
+        exit 5
+    fi
+
+    echo "rsc_defaults: resource-stickiness=${default_stickiness:-0}   migration-threshold=${default_migrationthreshold:-INFINITY}"
+    echo ""
+else
+    if [ -r /etc/os-release ]
+    then
+        # shellcheck disable=SC1091
+        source /etc/os-release		## get OS env for footer if available
+    fi
+    RAW_OUTPUT=$(cat -- "${INPUT_FILE}")
+    echo "rsc_defaults: n/a (parsed from offline file: ${INPUT_FILE})"
+    echo ""
+fi
+
+## NOTE: Strip only the trailing ":" on hostnames inside gawk (instead of global 'tr -d ":"')
+##       so clone/promotable instance suffixes like "rsc:0" remain readable and intact.
+## NOTE: Hosts and resources are sorted alphabetically via gawk asorti() before outputting them.
+
+# 1. Capture the scores and clean them (preserving Pacemaker phase order without ASCII 'sort -u')
+# 2. Use GAWK to build a matrix, preserving -INFINITY
 # 3. Sort the host headers for a consistent table layout
 # Execute and Parse
-$CMD | sort | awk ' / allocation score on / {
-    # $2=resource, $6=host, $NF=score
-    print $2, $6, $NF;
-}' | tr -d ":" | sort -u | \
-awk '
-{
-    r=$1; h=$2; s=$3;
+printf '%s\n' "${RAW_OUTPUT}" | gawk '
+/ allocation score on / {
+    # Match relative to "allocation score on" to tolerate optional prefixes/timestamps:
+    # ...(i-1)=resource, i="allocation", (i+1)="score", (i+2)="on", (i+3)=host, $NF=score
+    for (i = 2; i <= NF - 4; i++) {
+        if ($i == "allocation" && $(i+1) == "score" && $(i+2) == "on") {
+            r = $(i-1)
+            h = $(i+3)
+            s = $NF
 
-    # Logic to handle both INFINITY types:
-    # 1. If we already have -INFINITY, never overwrite (Hard Restriction)
-    if (a[r][h] == "-INFINITY") {
-        next
+            sub(/:$/, "", h)
+            sub(/^\+INFINITY$/, "INFINITY", s)
+
+            hosts[h]++
+            resources[r]++
+
+            # Logic to handle both INFINITY types:
+            # 1. If we already have -INFINITY, never overwrite (Hard Restriction)
+            if (a[r][h] == "-INFINITY") {
+                break
+            }
+
+            # 2. If the new score is -INFINITY, it always wins
+            if (s == "-INFINITY") {
+                a[r][h] = s
+                break
+            }
+
+            # 3. If we already have INFINITY, only -INFINITY can overwrite it
+            if (a[r][h] == "INFINITY") {
+                break
+            }
+
+            # 4. Otherwise, store the score (later pcmk__native_allocate updates preliminary group/clone score)
+            a[r][h] = s
+            break
+        }
     }
-
-    # 2. If the new score is -INFINITY, it always wins
-    if (s == "-INFINITY") {
-        a[r][h] = s
-        hosts[h]++
-        next
-    }
-
-    # 3. If we already have INFINITY, only -INFINITY can overwrite it
-    if (a[r][h] == "INFINITY") {
-        next
-    }
-
-    # 4. Otherwise, store the score
-    a[r][h] = s
-    hosts[h]++
 }
 
 END {
-    # Sort Host Headers
-    n_h = 0
-    for (h in hosts) sorted_hosts[++n_h] = h
-    asort(sorted_hosts)
+    # Sort Host Headers and Resources
+    n_h = asorti(hosts, sorted_hosts)
+    n_r = asorti(resources, res_list)
+
+    if (n_r == 0) {
+        print "[!!] No allocation scores found in input." > "/dev/stderr"
+        exit 6
+    }
+
+    # Calculate dynamic column widths (minimum 32 for resources, 18 for hosts)
+    r_width = 32
+    for (i = 1; i <= n_r; i++) {
+        if (length(res_list[i]) > r_width) r_width = length(res_list[i])
+    }
+
+    h_width = 18
+    for (i = 1; i <= n_h; i++) {
+        if (length(sorted_hosts[i]) > h_width) h_width = length(sorted_hosts[i])
+    }
 
     # Print Header
-    printf("##[ Resource ]#####[ Nodes ]##   ")
-    for (i=1; i<=n_h; i++) printf ("%18s ", sorted_hosts[i])
-    printf ("\n")
+    hdr = "##[ Resource ]#####[ Nodes ]##  "
+    printf("%-*s ", r_width, hdr)
+    for (i = 1; i <= n_h; i++) printf("%*s ", h_width, sorted_hosts[i])
+    printf("\n")
 
-    # Sort and Print Resources
-    n_r = 0
-    for (r in a) res_list[++n_r] = r
-    asort(res_list)
-
-    for (i=1; i<=n_r; i++) {
+    # Print Resources
+    for (i = 1; i <= n_r; i++) {
         r = res_list[i]
-        printf("%-32s ", r)
-        for (j=1; j<=n_h; j++) {
+        printf("%-*s ", r_width, r)
+        for (j = 1; j <= n_h; j++) {
             h = sorted_hosts[j]
             val = (h in a[r]) ? a[r][h] : "0"
-            printf("%18s ", val)
+            printf("%*s ", h_width, val)
         }
-        printf ("\n")
+        printf("\n")
     }
 }
 '
+rc=$?
+if [ "${rc}" -ne 0 ]
+then
+    exit "${rc}"
+fi
 
 echo ""
-echo "Showscore taken on node: $(hostname) ($PRETTY_NAME) at $(date)"
+if [ "${FROM_FILE}" -eq 1 ]
+then
+    echo "Showscore parsed from '${INPUT_FILE}' on node: $(hostname) (${PRETTY_NAME:-unknown}) at $(date)"
+else
+    echo "Showscore taken on node: $(hostname) (${PRETTY_NAME:-unknown}) at $(date)"
+fi
+
+exit 0
