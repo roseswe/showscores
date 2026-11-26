@@ -168,6 +168,6 @@ end of documentation....
 
 <!--
 vim:set fileencoding=utf8 fileformat=unix filetype=gfm tabstop=2 expandtab:
-$Id: Readme.md,v 1.15 2026/03/20 12:53:57 ralph Exp $
+$Id: Readme.md,v 1.16 2026/11/26 13:19:11 ralph Exp $
 -->
 Exit Code ReferenceExit CodeMeaning0Success (scores displayed or --help shown)1Unsupported operating system (ID from /etc/os-release)2Input file specified, but missing or not readable3/etc/os-release missing or not readable in live mode4Required binary (gawk or crm_simulate) not found in PATH5Cluster query failed (cluster stopped or insufficient permissions)6No allocation score on entries found in the output/file7Too many command-line arguments
